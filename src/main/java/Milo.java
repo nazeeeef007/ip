@@ -8,8 +8,7 @@ public class Milo {
         String name = "Milo";
 
         System.out.println("____________________________________________________________");
-        System.out.println(" Hello! I'm " + name);
-        System.out.println(" What can I do for you?");
+        System.out.println(" Hello! I'm " + name + "\n What can I do for you?");
         System.out.println("____________________________________________________________");
 
         while (true) {
@@ -24,22 +23,24 @@ public class Milo {
                     System.out.println(" " + (i + 1) + "." + taskList.get(i));
                 }
             } else if (input.startsWith("mark ")) {
-                // Extracts the number after "mark "
-                int taskIndex = Integer.parseInt(input.substring(5)) - 1;
-                taskList.get(taskIndex).markAsDone();
-                System.out.println(" Nice! I've marked this task as done:");
-                System.out.println("   " + taskList.get(taskIndex));
+                handleMarkUnmark(input, taskList, true);
             } else if (input.startsWith("unmark ")) {
-                // Extracts the number after "unmark "
-                int taskIndex = Integer.parseInt(input.substring(7)) - 1;
-                taskList.get(taskIndex).unmarkDone();
-                System.out.println(" OK, I've marked this task as not done yet:");
-                System.out.println("   " + taskList.get(taskIndex));
+                handleMarkUnmark(input, taskList, false);
+            } else if (input.startsWith("todo ")) {
+                String desc = input.substring(5);
+                addTask(taskList, new Todo(desc));
+            } else if (input.startsWith("deadline ")) {
+                // Format: deadline return book /by Sunday
+                String[] parts = input.substring(9).split(" /by ");
+                addTask(taskList, new Deadline(parts[0], parts[1]));
+            } else if (input.startsWith("event ")) {
+                // Format: event meeting /from Mon 2pm /to 4pm
+                String[] parts = input.substring(6).split(" /from ");
+                String desc = parts[0];
+                String[] timeParts = parts[1].split(" /to ");
+                addTask(taskList, new Event(desc, timeParts[0], timeParts[1]));
             } else {
-                // Standard Level 2 logic: Treat input as a new Task description
-                Task newTask = new Task(input);
-                taskList.add(newTask);
-                System.out.println(" added: " + input);
+                addTask(taskList, new Task(input));
             }
 
             System.out.println("____________________________________________________________");
@@ -47,5 +48,29 @@ public class Milo {
 
         System.out.println(" Bye. Hope to see you again soon!");
         System.out.println("____________________________________________________________");
+    }
+
+
+    private static void addTask(ArrayList<Task> list, Task t) {
+        list.add(t);
+        System.out.println(" Got it. I've added this task:");
+        System.out.println("   " + t);
+        System.out.println(" Now you have " + list.size() + " tasks in the list.");
+    }
+
+
+    private static void handleMarkUnmark(String input, ArrayList<Task> list, boolean isMark) {
+        try {
+            int idx = Integer.parseInt(input.split(" ")[1]) - 1;
+            if (isMark) {
+                list.get(idx).markAsDone();
+                System.out.println(" Nice! I've marked this task as done:\n   " + list.get(idx));
+            } else {
+                list.get(idx).unmarkDone();
+                System.out.println(" OK, I've marked this task as not done yet:\n   " + list.get(idx));
+            }
+        } catch (Exception e) {
+            System.out.println(" OOPS!!! Please provide a valid task number.");
+        }
     }
 }
