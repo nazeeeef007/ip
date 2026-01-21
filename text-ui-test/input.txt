@@ -1,13 +1,8 @@
-todo
-deadline
-deadline finish project /by
-event
-event party /from 6pm
-blah
-mark abc
-mark 100
-unmark
 todo read book
+deadline return book /by Sunday
+event project meeting /from Mon 2pm /to 4pm
+list
+delete 2
 mark 1
 list
 bye

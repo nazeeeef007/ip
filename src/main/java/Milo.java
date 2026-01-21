@@ -56,8 +56,9 @@ public class Milo {
                         throw new MiloException("OOPS!!! The event description or time range is incomplete.");
                     }
                     addTask(taskList, new Event(desc, timeParts[0], timeParts[1]));
+                } else if (input.startsWith("delete")) {
+                    handleDelete(input, taskList);
                 } else {
-
                     throw new MiloException("OOPS!!! I'm sorry, but I don't know what that means :-(");
                 }
             } catch (MiloException e) {
@@ -99,6 +100,27 @@ public class Milo {
                 list.get(idx).unmarkDone();
                 System.out.println(" OK, I've marked this task as not done yet:\n   " + list.get(idx));
             }
+        } catch (NumberFormatException e) {
+            throw new MiloException("OOPS!!! '" + parts[1] + "' is not a valid task number.");
+        }
+    }
+
+    private static void handleDelete(String input, ArrayList<Task> list) throws MiloException {
+        String[] parts = input.split(" ");
+        if (parts.length < 2) {
+            throw new MiloException("OOPS!!! Please specify the task number to delete.");
+        }
+
+        try {
+            int idx = Integer.parseInt(parts[1]) - 1;
+            if (idx < 0 || idx >= list.size()) {
+                throw new MiloException("OOPS!!! Task number " + (idx + 1) + " does not exist.");
+            }
+
+            Task removedTask = list.remove(idx);
+            System.out.println(" Noted. I've removed this task:");
+            System.out.println("   " + removedTask);
+            System.out.println(" Now you have " + list.size() + " tasks in the list.");
         } catch (NumberFormatException e) {
             throw new MiloException("OOPS!!! '" + parts[1] + "' is not a valid task number.");
         }
