@@ -11,67 +11,77 @@ public class Milo {
         System.out.println(" Hello! I'm " + name + "\n What can I do for you?");
         System.out.println("____________________________________________________________");
 
-        while (true) {
+        boolean isExit = false;
+        while (!isExit) {
             String input = scanner.nextLine();
+            if (input.trim().isEmpty()) continue;
+
+            String[] words = input.split(" ", 2);
+            Command command = Command.fromString(words[0]);
+
             System.out.println("____________________________________________________________");
-
             try {
-                if (input.equals("bye")) {
-                    break;
-                } else if (input.equals("list")) {
-                    System.out.println(" Here are the tasks in your list:");
-                    for (int i = 0; i < taskList.size(); i++) {
-                        System.out.println(" " + (i + 1) + "." + taskList.get(i));
-                    }
-                } else if (input.startsWith("mark")) {
-                    handleMarkUnmark(input, taskList, true);
-                } else if (input.startsWith("unmark")) {
-                    handleMarkUnmark(input, taskList, false);
-                } else if (input.startsWith("todo")) {
+                switch (command) {
+                    case BYE:
+                        isExit = true;
+                        break;
 
-                    if (input.trim().length() <= 4) {
-                        throw new MiloException("OOPS!!! The description of a todo cannot be empty.");
-                    }
-                    String desc = input.substring(5);
-                    addTask(taskList, new Todo(desc));
-                } else if (input.startsWith("deadline")) {
+                    case LIST:
+                        System.out.println(" Here are the tasks in your list:");
+                        for (int i = 0; i < taskList.size(); i++) {
+                            System.out.println(" " + (i + 1) + "." + taskList.get(i));
+                        }
+                        break;
 
-                    if (!input.contains(" /by ")) {
-                        throw new MiloException("OOPS!!! Deadlines must include ' /by ' followed by the time.");
-                    }
-                    String[] parts = input.substring(9).split(" /by ");
-                    if (parts.length < 2 || parts[0].trim().isEmpty()) {
-                        throw new MiloException("OOPS!!! The description or time of a deadline cannot be empty.");
-                    }
-                    addTask(taskList, new Deadline(parts[0], parts[1]));
-                } else if (input.startsWith("event")) {
+                    case MARK:
+                        handleMarkUnmark(input, taskList, true);
+                        break;
 
-                    if (!input.contains(" /from ") || !input.contains(" /to ")) {
-                        throw new MiloException("OOPS!!! Events must include ' /from ' and ' /to '. ");
-                    }
-                    String[] parts = input.substring(6).split(" /from ");
-                    String desc = parts[0];
-                    String[] timeParts = parts[1].split(" /to ");
-                    if (timeParts.length < 2 || desc.trim().isEmpty()) {
-                        throw new MiloException("OOPS!!! The event description or time range is incomplete.");
-                    }
-                    addTask(taskList, new Event(desc, timeParts[0], timeParts[1]));
-                } else if (input.startsWith("delete")) {
-                    handleDelete(input, taskList);
-                } else {
-                    throw new MiloException("OOPS!!! I'm sorry, but I don't know what that means :-(");
+                    case UNMARK:
+                        handleMarkUnmark(input, taskList, false);
+                        break;
+
+                    case TODO:
+                        if (words.length < 2 || words[1].trim().isEmpty()) {
+                            throw new MiloException("OOPS!!! The description of a todo cannot be empty.");
+                        }
+                        addTask(taskList, new Todo(words[1]));
+                        break;
+
+                    case DEADLINE:
+                        if (words.length < 2 || !words[1].contains(" /by ")) {
+                            throw new MiloException("OOPS!!! Deadlines must include description and ' /by ' [time].");
+                        }
+                        String[] dParts = words[1].split(" /by ", 2);
+                        addTask(taskList, new Deadline(dParts[0], dParts[1]));
+                        break;
+
+                    case EVENT:
+                        if (words.length < 2 || !words[1].contains(" /from ") || !words[1].contains(" /to ")) {
+                            throw new MiloException("OOPS!!! Events must include description, ' /from ' [time] and ' /to ' [time].");
+                        }
+                        String[] eParts = words[1].split(" /from ", 2);
+                        String[] timeParts = eParts[1].split(" /to ", 2);
+                        addTask(taskList, new Event(eParts[0], timeParts[0], timeParts[1]));
+                        break;
+
+                    case DELETE:
+                        handleDelete(input, taskList);
+                        break;
+
+                    case UNKNOWN:
+                    default:
+                        throw new MiloException("OOPS!!! I'm sorry, but I don't know what that means :-(");
                 }
             } catch (MiloException e) {
                 System.out.println(" " + e.getMessage());
             }
-
             System.out.println("____________________________________________________________");
         }
 
         System.out.println(" Bye. Hope to see you again soon!");
         System.out.println("____________________________________________________________");
     }
-
 
     private static void addTask(ArrayList<Task> list, Task t) {
         list.add(t);
@@ -80,19 +90,16 @@ public class Milo {
         System.out.println(" Now you have " + list.size() + " tasks in the list.");
     }
 
-
     private static void handleMarkUnmark(String input, ArrayList<Task> list, boolean isMark) throws MiloException {
         String[] parts = input.split(" ");
         if (parts.length < 2) {
             throw new MiloException("OOPS!!! Please specify the task number.");
         }
-
         try {
             int idx = Integer.parseInt(parts[1]) - 1;
             if (idx < 0 || idx >= list.size()) {
                 throw new MiloException("OOPS!!! Task number " + (idx + 1) + " does not exist.");
             }
-
             if (isMark) {
                 list.get(idx).markAsDone();
                 System.out.println(" Nice! I've marked this task as done:\n   " + list.get(idx));
@@ -110,13 +117,11 @@ public class Milo {
         if (parts.length < 2) {
             throw new MiloException("OOPS!!! Please specify the task number to delete.");
         }
-
         try {
             int idx = Integer.parseInt(parts[1]) - 1;
             if (idx < 0 || idx >= list.size()) {
                 throw new MiloException("OOPS!!! Task number " + (idx + 1) + " does not exist.");
             }
-
             Task removedTask = list.remove(idx);
             System.out.println(" Noted. I've removed this task:");
             System.out.println("   " + removedTask);
