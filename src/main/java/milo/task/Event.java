@@ -3,10 +3,21 @@ package milo.task;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
+/**
+ * Represents a task that occurs during a specific time period.
+ * Contains a description, a start date, and an end date.
+ */
 public class Event extends Task {
     protected LocalDate from;
     protected LocalDate to;
 
+    /**
+     * Constructs an Event task with a description, start date, and end date.
+     *
+     * @param description The description of the event.
+     * @param from The start date string in YYYY-MM-DD format.
+     * @param to The end date string in YYYY-MM-DD format.
+     */
     public Event(String description, String from, String to) {
         super(description);
         this.from = LocalDate.parse(from.trim());
@@ -25,5 +36,12 @@ public class Event extends Task {
         return "E | " + super.toFileFormat() + " | " + from + " | " + to;
     }
 
-    public LocalDate getFrom() { return this.from; }
+    /**
+     * Returns the start date of the event.
+     *
+     * @return The LocalDate representing the start of the event.
+     */
+    public LocalDate getFrom() {
+        return this.from;
+    }
 }

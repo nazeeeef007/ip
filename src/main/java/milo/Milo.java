@@ -21,9 +21,8 @@ public class Milo {
         storage = new Storage(filePath);
         try {
             tasks = new TaskList(storage.load());
-        } catch (MiloException e) {
-            ui.showError("Problem loading file. Starting with an empty list.");
-            tasks = new TaskList();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 

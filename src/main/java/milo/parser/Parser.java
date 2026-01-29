@@ -4,33 +4,40 @@ import milo.task.Task;
 import milo.ui.Ui;
 import milo.storage.Storage;
 import milo.task.TaskList;
-import milo.task.Task;
 import milo.task.Todo;
 import milo.task.Event;
 import milo.task.Deadline;
 import milo.exception.MiloException;
 import milo.command.Command;
+
 import java.io.IOException;
 import java.time.format.DateTimeParseException;
 
+/**
+ * Deciphers user input and translates it into specific actions for Milo.
+ * Responsible for validating command arguments and coordinating with TaskList, Ui, and Storage.
+ */
 public class Parser {
 
     /**
-     * Parses the user input and executes the command.
-     * * @param fullCommand The raw input from the user.
-     * @param tasks The milo.task.TaskList to modify.
-     * @param ui The milo.ui.Ui to handle display.
-     * @param storage The milo.storage.Storage to handle saving.
-     * @return boolean true if it's an exit command, false otherwise.
-     * @throws MiloException If command is invalid or arguments are missing.
+     * Parses the user input and executes the corresponding command.
+     *
+     * @param fullCommand The raw input string provided by the user.
+     * @param tasks The TaskList to be manipulated based on the command.
+     * @param ui The user interface to handle output messages.
+     * @param storage The storage component to save changes after execution.
+     * @return true if the command signals an exit (bye), false otherwise.
+     * @throws MiloException If the command is unrecognized or arguments are invalid.
+     * @throws IOException If there is an error saving data to the file.
      */
-    public static boolean parse(String fullCommand, TaskList tasks, Ui ui, Storage storage) throws MiloException, IOException {
+    public static boolean parse(String fullCommand, TaskList tasks, Ui ui, Storage storage)
+            throws MiloException, IOException {
         String[] words = fullCommand.split(" ", 2);
         Command command = Command.fromString(words[0]);
 
         switch (command) {
             case BYE:
-                return true; // Signal to exit the loop
+                return true;
 
             case LIST:
                 ui.showTaskList(tasks);
@@ -69,11 +76,18 @@ public class Parser {
                 throw new MiloException("OOPS!!! I'm sorry, but I don't know what that means :-(");
         }
 
-        // Save after every command that isn't BYE
         storage.save(tasks.getTasks());
         return false;
     }
 
+    /**
+     * Handles the creation and addition of a Todo task.
+     *
+     * @param words The split input containing the command and description.
+     * @param tasks The TaskList to add the Todo to.
+     * @param ui The user interface to show feedback.
+     * @throws MiloException If the description is empty.
+     */
     private static void handleTodo(String[] words, TaskList tasks, Ui ui) throws MiloException {
         if (words.length < 2 || words[1].trim().isEmpty()) {
             throw new MiloException("The description of a todo cannot be empty.");
@@ -83,6 +97,14 @@ public class Parser {
         ui.showAddedTask(t, tasks.getSize());
     }
 
+    /**
+     * Handles the creation and addition of a Deadline task.
+     *
+     * @param words The split input containing description and date.
+     * @param tasks The TaskList to add the Deadline to.
+     * @param ui The user interface to show feedback.
+     * @throws MiloException If the format is incorrect or date is missing.
+     */
     private static void handleDeadline(String[] words, TaskList tasks, Ui ui) throws MiloException {
         if (words.length < 2 || !words[1].contains(" /by ")) {
             throw new MiloException("Deadlines must include description and ' /by ' [yyyy-mm-dd].");
@@ -97,6 +119,14 @@ public class Parser {
         }
     }
 
+    /**
+     * Handles the creation and addition of an Event task.
+     *
+     * @param words The split input containing description and time range.
+     * @param tasks The TaskList to add the Event to.
+     * @param ui The user interface to show feedback.
+     * @throws MiloException If the format is incorrect or dates are missing.
+     */
     private static void handleEvent(String[] words, TaskList tasks, Ui ui) throws MiloException {
         if (words.length < 2 || !words[1].contains(" /from ") || !words[1].contains(" /to ")) {
             throw new MiloException("Events must include description, ' /from ' and ' /to ' [yyyy-mm-dd].");
@@ -112,8 +142,19 @@ public class Parser {
         }
     }
 
+    /**
+     * Handles the marking or unmarking of a task as done.
+     *
+     * @param words The split input containing the task index.
+     * @param tasks The TaskList to search for the task.
+     * @param ui The user interface to show feedback.
+     * @param isMark True to mark as done, false to unmark.
+     * @throws MiloException If the index is missing or invalid.
+     */
     private static void handleMarkUnmark(String[] words, TaskList tasks, Ui ui, boolean isMark) throws MiloException {
-        if (words.length < 2) throw new MiloException("Please specify the task number.");
+        if (words.length < 2) {
+            throw new MiloException("Please specify the task number.");
+        }
         try {
             int idx = Integer.parseInt(words[1]) - 1;
             Task t = tasks.getTask(idx);
@@ -129,8 +170,18 @@ public class Parser {
         }
     }
 
+    /**
+     * Handles the deletion of a task from the list.
+     *
+     * @param words The split input containing the task index to delete.
+     * @param tasks The TaskList to remove the task from.
+     * @param ui The user interface to show feedback.
+     * @throws MiloException If the index is missing or invalid.
+     */
     private static void handleDelete(String[] words, TaskList tasks, Ui ui) throws MiloException {
-        if (words.length < 2) throw new MiloException("Please specify the task number to delete.");
+        if (words.length < 2) {
+            throw new MiloException("Please specify the task number to delete.");
+        }
         try {
             int idx = Integer.parseInt(words[1]) - 1;
             Task removed = tasks.deleteTask(idx);
@@ -140,8 +191,18 @@ public class Parser {
         }
     }
 
+    /**
+     * Handles searching for tasks occurring on a specific date.
+     *
+     * @param words The split input containing the search date.
+     * @param tasks The TaskList to search within.
+     * @param ui The user interface to display matching tasks.
+     * @throws MiloException If the date is missing.
+     */
     private static void handleFindDate(String[] words, TaskList tasks, Ui ui) throws MiloException {
-        if (words.length < 2) throw new MiloException("Please specify a date in YYYY-MM-DD format.");
+        if (words.length < 2) {
+            throw new MiloException("Please specify a date in YYYY-MM-DD format.");
+        }
         ui.showTasksByDate(words[1].trim(), tasks.getTasks());
     }
 }
