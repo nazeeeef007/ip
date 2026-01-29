@@ -13,17 +13,13 @@ public class Storage {
         this.filePath = filePath;
     }
 
-    public void save(ArrayList<Task> tasks) {
-        try {
-            Files.createDirectories(Paths.get("./data"));
-            List<String> lines = new ArrayList<>();
-            for (Task t : tasks) {
-                lines.add(t.toFileFormat());
-            }
-            Files.write(Paths.get(filePath), lines);
-        } catch (IOException e) {
-            System.out.println(" Error saving tasks: " + e.getMessage());
+    public void save(ArrayList<Task> tasks) throws IOException {
+        Files.createDirectories(Paths.get("./data"));
+        List<String> lines = new ArrayList<>();
+        for (Task t : tasks) {
+            lines.add(t.toFileFormat());
         }
+        Files.write(Paths.get(filePath), lines);
     }
 
     public ArrayList<Task> load() throws MiloException {
@@ -42,7 +38,7 @@ public class Storage {
                 }
             }
         } catch (IOException e) {
-            throw new MiloException("Could not load file.");
+            throw new MiloException("Error: Could not load data from " + filePath);
         }
         return taskList;
     }
@@ -56,7 +52,7 @@ public class Storage {
                 default: return null;
             }
         } catch (DateTimeParseException | ArrayIndexOutOfBoundsException e) {
-            return null;
+            return null; // Skip corrupted lines
         }
     }
 }
