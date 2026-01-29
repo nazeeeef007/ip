@@ -1,14 +1,20 @@
 package milo.storage;
 
 import milo.task.Task;
+import milo.exception.MiloException;
 import milo.task.Todo;
+import milo.task.Event;
 import milo.task.Deadline;
 import milo.task.Event;
+import milo.exception.MiloException;
 import milo.exception.MiloException;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -65,9 +71,10 @@ public class Storage {
      * @throws IOException If there is an error writing to the file.
      */
     public void save(ArrayList<Task> tasks) throws IOException {
-        FileWriter writer = new FileWriter(filePath);
+        Files.createDirectories(Paths.get("./data"));
+        List<String> lines = new ArrayList<>();
         for (Task t : tasks) {
-            writer.write(t.toFileFormat() + System.lineSeparator());
+            lines.add(t.toFileFormat());
         }
         writer.close();
     }
@@ -99,6 +106,8 @@ public class Storage {
             default:
                 throw new MiloException("Unknown task type in file.");
         }
+        return taskList;
+    }
 
         if (isDone) {
             t.markAsDone();

@@ -84,7 +84,7 @@ public class Ui {
      */
     public void showAddedTask(Task t, int size) {
         System.out.println(" Got it. I've added this task:");
-        System.out.println("   " + t);
+        System.out.println("   " + task);
         System.out.println(" Now you have " + size + " tasks in the list.");
     }
 
@@ -96,7 +96,7 @@ public class Ui {
      */
     public void showRemovedTask(Task t, int size) {
         System.out.println(" Noted. I've removed this task:");
-        System.out.println("   " + t);
+        System.out.println("   " + task);
         System.out.println(" Now you have " + size + " tasks in the list.");
     }
 
@@ -108,9 +108,9 @@ public class Ui {
      */
     public void showStatusChange(Task t, boolean isMark) {
         if (isMark) {
-            System.out.println(" Nice! I've marked this task as done:\n   " + t);
+            System.out.println(" Nice! I've marked this task as done:\n   " + task);
         } else {
-            System.out.println(" OK, I've marked this task as not done yet:\n   " + t);
+            System.out.println(" OK, I've marked this task as not done yet:\n   " + task);
         }
     }
 
@@ -126,7 +126,7 @@ public class Ui {
             System.out.println(" Here are the tasks occurring on "
                     + queryDate.format(DateTimeFormatter.ofPattern("MMM dd yyyy")) + ":");
             int count = 0;
-            for (Task t : list) {
+            for (Task task : list) {
                 boolean isMatch = false;
                 if (t instanceof Deadline && ((Deadline) t).getBy().equals(queryDate)) {
                     isMatch = true;
@@ -137,7 +137,7 @@ public class Ui {
 
                 if (isMatch) {
                     count++;
-                    System.out.println(" " + count + "." + t);
+                    System.out.println(" " + count + "." + task);
                 }
             }
             if (count == 0) {

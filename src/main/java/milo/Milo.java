@@ -7,14 +7,18 @@ import milo.task.TaskList;
 import milo.parser.Parser;
 import milo.exception.MiloException;
 
+/**
+ * Acts as the entry point and controller for the Milo task management application.
+ */
 public class Milo {
     private Storage storage;
     private TaskList tasks;
     private Ui ui;
 
     /**
-     * Initializes the milo.Milo application with a file path for data storage.
-     * * @param filePath The path to the file where tasks are saved.
+     * Initializes the Milo application with a file path for data storage.
+     *
+     * @param filePath The path to the file where tasks are saved.
      */
     public Milo(String filePath) {
         ui = new Ui();
@@ -41,11 +45,8 @@ public class Milo {
                 }
 
                 ui.showLine();
-                // This now potentially throws both milo.exception.MiloException and IOException
                 isExit = Parser.parse(fullCommand, tasks, ui, storage);
-
             } catch (MiloException | IOException e) {
-                // Multi-catch: handles both custom errors and file system errors
                 ui.showError(e.getMessage());
             } finally {
                 ui.showLine();
@@ -55,7 +56,6 @@ public class Milo {
     }
 
     public static void main(String[] args) {
-
         new Milo("./data/milo.txt").run();
     }
 }
