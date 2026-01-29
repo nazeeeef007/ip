@@ -1,4 +1,11 @@
+package milo;
+
 import java.io.IOException;
+import milo.ui.Ui;
+import milo.storage.Storage;
+import milo.task.TaskList;
+import milo.parser.Parser;
+import milo.exception.MiloException;
 
 public class Milo {
     private Storage storage;
@@ -6,7 +13,7 @@ public class Milo {
     private Ui ui;
 
     /**
-     * Initializes the Milo application with a file path for data storage.
+     * Initializes the milo.Milo application with a file path for data storage.
      * * @param filePath The path to the file where tasks are saved.
      */
     public Milo(String filePath) {
@@ -35,7 +42,7 @@ public class Milo {
                 }
 
                 ui.showLine();
-                // This now potentially throws both MiloException and IOException
+                // This now potentially throws both milo.exception.MiloException and IOException
                 isExit = Parser.parse(fullCommand, tasks, ui, storage);
 
             } catch (MiloException | IOException e) {

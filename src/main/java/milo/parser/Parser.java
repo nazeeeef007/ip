@@ -1,3 +1,15 @@
+package milo.parser;
+
+import milo.task.Task;
+import milo.ui.Ui;
+import milo.storage.Storage;
+import milo.task.TaskList;
+import milo.task.Task;
+import milo.task.Todo;
+import milo.task.Event;
+import milo.task.Deadline;
+import milo.exception.MiloException;
+import milo.command.Command;
 import java.io.IOException;
 import java.time.format.DateTimeParseException;
 
@@ -6,9 +18,9 @@ public class Parser {
     /**
      * Parses the user input and executes the command.
      * * @param fullCommand The raw input from the user.
-     * @param tasks The TaskList to modify.
-     * @param ui The Ui to handle display.
-     * @param storage The Storage to handle saving.
+     * @param tasks The milo.task.TaskList to modify.
+     * @param ui The milo.ui.Ui to handle display.
+     * @param storage The milo.storage.Storage to handle saving.
      * @return boolean true if it's an exit command, false otherwise.
      * @throws MiloException If command is invalid or arguments are missing.
      */

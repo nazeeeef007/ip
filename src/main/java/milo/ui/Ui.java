@@ -1,3 +1,10 @@
+package milo.ui;
+
+import milo.task.Task;
+import milo.task.TaskList;
+import milo.task.Event;
+import milo.task.Deadline;
+
 import java.util.Scanner;
 import java.util.ArrayList;
 import java.time.LocalDate;
