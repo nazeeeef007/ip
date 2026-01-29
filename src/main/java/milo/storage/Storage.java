@@ -1,26 +1,21 @@
 package milo.storage;
 
-import milo.task.Task;
-import milo.exception.MiloException;
-import milo.task.Todo;
-import milo.task.Event;
-import milo.task.Deadline;
-import milo.task.Event;
-import milo.exception.MiloException;
-import milo.exception.MiloException;
-
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+import milo.exception.MiloException;
+import milo.task.Deadline;
+import milo.task.Event;
+import milo.task.Task;
+import milo.task.Todo;
+
 /**
  * Handles loading and saving tasks to a file on the hard drive.
- * Responsible for converting task data between file format and application objects.
  */
 public class Storage {
     private final String filePath;
@@ -36,31 +31,36 @@ public class Storage {
 
     /**
      * Loads tasks from the storage file.
-     * If the file or directory does not exist, they will be created.
      *
      * @return An ArrayList of tasks loaded from the file.
-     * @throws IOException If there is an error reading the file or creating the directory.
+     * @throws MiloException If there is an error creating the file structure.
      */
-    public ArrayList<Task> load() throws IOException {
+    public ArrayList<Task> load() throws MiloException {
         ArrayList<Task> tasks = new ArrayList<>();
         File file = new File(filePath);
 
-        if (!file.exists()) {
-            file.getParentFile().mkdirs();
-            file.createNewFile();
-            return tasks;
-        }
-
-        Scanner scanner = new Scanner(file);
-        while (scanner.hasNextLine()) {
-            String line = scanner.nextLine();
-            try {
-                tasks.add(parseTaskFromFile(line));
-            } catch (MiloException e) {
-                // Skips corrupted lines in the data file
+        try {
+            if (!file.exists()) {
+                if (file.getParentFile() != null) {
+                    file.getParentFile().mkdirs();
+                }
+                file.createNewFile();
+                return tasks;
             }
+
+            Scanner scanner = new Scanner(file);
+            while (scanner.hasNextLine()) {
+                String line = scanner.nextLine();
+                try {
+                    tasks.add(parseTaskFromFile(line));
+                } catch (MiloException e) {
+                    // Ignore corrupted lines
+                }
+            }
+            scanner.close();
+        } catch (IOException e) {
+            throw new MiloException("Error loading storage file: " + e.getMessage());
         }
-        scanner.close();
         return tasks;
     }
 
@@ -71,10 +71,10 @@ public class Storage {
      * @throws IOException If there is an error writing to the file.
      */
     public void save(ArrayList<Task> tasks) throws IOException {
-        Files.createDirectories(Paths.get("./data"));
-        List<String> lines = new ArrayList<>();
-        for (Task t : tasks) {
-            lines.add(t.toFileFormat());
+        Files.createDirectories(Paths.get(filePath).getParent());
+        FileWriter writer = new FileWriter(filePath);
+        for (Task task : tasks) {
+            writer.write(task.toFileFormat() + System.lineSeparator());
         }
         writer.close();
     }
@@ -88,30 +88,32 @@ public class Storage {
      */
     private Task parseTaskFromFile(String line) throws MiloException {
         String[] parts = line.split(" \\| ");
+        if (parts.length < 3) {
+            throw new MiloException("Corrupted task line.");
+        }
+
         String type = parts[0];
         boolean isDone = parts[1].equals("1");
         String description = parts[2];
 
-        Task t;
+        Task task;
         switch (type) {
             case "T":
-                t = new Todo(description);
+                task = new Todo(description);
                 break;
             case "D":
-                t = new Deadline(description, parts[3]);
+                task = new Deadline(description, parts[3]);
                 break;
             case "E":
-                t = new Event(description, parts[3], parts[4]);
+                task = new Event(description, parts[3], parts[4]);
                 break;
             default:
-                throw new MiloException("Unknown task type in file.");
+                throw new MiloException("Unknown task type.");
         }
-        return taskList;
-    }
 
         if (isDone) {
-            t.markAsDone();
+            task.markAsDone();
         }
-        return t;
+        return task;
     }
 }

@@ -4,7 +4,7 @@ package milo.command;
  * Represents the various commands supported by the Milo application.
  */
 public enum Command {
-    BYE, LIST, MARK, UNMARK, TODO, DEADLINE, EVENT, DELETE, FIND_DATE, UNKNOWN;
+    BYE, LIST, MARK, UNMARK, TODO, DEADLINE, EVENT, DELETE, FIND_DATE, FIND, UNKNOWN;
 
     /**
      * Translates a raw string input into a Command enum constant.
@@ -17,6 +17,7 @@ public enum Command {
             if (input.equalsIgnoreCase("find-date")) {
                 return FIND_DATE;
             }
+            // Standardizes input to match enum names
             return Command.valueOf(input.toUpperCase());
         } catch (IllegalArgumentException e) {
             return UNKNOWN;

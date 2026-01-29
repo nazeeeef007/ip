@@ -25,7 +25,7 @@ public class Milo {
         storage = new Storage(filePath);
         try {
             tasks = new TaskList(storage.load());
-        } catch (IOException e) {
+        } catch (MiloException e) {
             throw new RuntimeException(e);
         }
     }

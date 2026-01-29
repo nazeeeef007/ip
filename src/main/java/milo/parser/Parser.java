@@ -1,18 +1,18 @@
 package milo.parser;
 
-import milo.task.Task;
-import milo.ui.Ui;
-import milo.storage.Storage;
-import milo.task.TaskList;
-import milo.task.Task;
-import milo.task.Todo;
-import milo.task.Event;
-import milo.task.Deadline;
-import milo.exception.MiloException;
-import milo.command.Command;
-
 import java.io.IOException;
 import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
+
+import milo.command.Command;
+import milo.exception.MiloException;
+import milo.storage.Storage;
+import milo.task.Deadline;
+import milo.task.Event;
+import milo.task.Task;
+import milo.task.TaskList;
+import milo.task.Todo;
+import milo.ui.Ui;
 
 /**
  * Deciphers user input and translates it into specific actions for Milo.
@@ -39,45 +39,38 @@ public class Parser {
         switch (command) {
             case BYE:
                 return true;
-
             case LIST:
                 ui.showTaskList(tasks);
                 break;
-
             case MARK:
                 handleMarkUnmark(words, tasks, ui, true);
                 break;
-
             case UNMARK:
                 handleMarkUnmark(words, tasks, ui, false);
                 break;
-
             case TODO:
                 handleTodo(words, tasks, ui);
                 break;
-
             case DEADLINE:
                 handleDeadline(words, tasks, ui);
                 break;
-
             case EVENT:
                 handleEvent(words, tasks, ui);
                 break;
-
             case DELETE:
                 handleDelete(words, tasks, ui);
                 break;
-
             case FIND_DATE:
                 handleFindDate(words, tasks, ui);
                 break;
-
+            case FIND:
+                handleFind(words, tasks, ui);
+                break;
             case UNKNOWN:
             default:
                 throw new MiloException("OOPS!!! I'm sorry, but I don't know what that means :-(");
         }
 
-        // Save after every command that isn't BYE
         storage.save(tasks.getTasks());
         return false;
     }
@@ -210,10 +203,24 @@ public class Parser {
         if (words.length < 2) {
             throw new MiloException("Please specify a date in YYYY-MM-DD format.");
         }
-
-        if (words.length < 2) {
-            throw new MiloException("Please specify a date in YYYY-MM-DD format.");
-        }
         ui.showTasksByDate(words[1].trim(), tasks.getTasks());
+    }
+
+    /**
+     * Handles searching for tasks by keyword.
+     *
+     * @param words The split input containing the keyword.
+     * @param tasks The TaskList to search within.
+     * @param ui The user interface to display matching tasks.
+     * @throws MiloException If the keyword is missing.
+     */
+    private static void handleFind(String[] words, TaskList tasks, Ui ui) throws MiloException {
+        if (words.length < 2 || words[1].trim().isEmpty()) {
+            throw new MiloException("Please specify a keyword to find.");
+        }
+
+        String keyword = words[1].trim();
+        ArrayList<Task> matchingTasks = tasks.findTasks(keyword);
+        ui.showMatchingTasks(matchingTasks);
     }
 }

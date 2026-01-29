@@ -1,7 +1,7 @@
 package milo.task;
 
 /**
- * Represents a basic task without any specific date or time.
+ * Represents a simple task without any associated date or time.
  */
 public class Todo extends Task {
 

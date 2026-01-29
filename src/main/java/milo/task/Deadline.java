@@ -4,8 +4,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
 /**
- * Represents a task with a deadline.
- * Contains a description and a date by which the task must be completed.
+ * Represents a task with a specific deadline.
  */
 public class Deadline extends Task {
     protected LocalDate by;
@@ -18,8 +17,16 @@ public class Deadline extends Task {
      */
     public Deadline(String description, String by) {
         super(description);
-        // trim() is important to remove accidental spaces around the date
         this.by = LocalDate.parse(by.trim());
+    }
+
+    /**
+     * Returns the deadline date of the task.
+     *
+     * @return The LocalDate representing the deadline.
+     */
+    public LocalDate getBy() {
+        return this.by;
     }
 
     @Override
@@ -31,14 +38,5 @@ public class Deadline extends Task {
     @Override
     public String toFileFormat() {
         return "D | " + super.toFileFormat() + " | " + by;
-    }
-
-    /**
-     * Returns the deadline date of the task.
-     *
-     * @return The LocalDate representing the deadline.
-     */
-    public LocalDate getBy() {
-        return this.by;
     }
 }

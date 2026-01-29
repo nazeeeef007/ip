@@ -5,7 +5,6 @@ import java.time.format.DateTimeFormatter;
 
 /**
  * Represents a task that occurs during a specific time period.
- * Contains a description, a start date, and an end date.
  */
 public class Event extends Task {
     protected LocalDate from;
@@ -24,6 +23,15 @@ public class Event extends Task {
         this.to = LocalDate.parse(to.trim());
     }
 
+    /**
+     * Returns the start date of the event.
+     *
+     * @return The LocalDate representing the start of the event.
+     */
+    public LocalDate getFrom() {
+        return this.from;
+    }
+
     @Override
     public String toString() {
         return "[E]" + super.toString() + " (from: "
@@ -34,14 +42,5 @@ public class Event extends Task {
     @Override
     public String toFileFormat() {
         return "E | " + super.toFileFormat() + " | " + from + " | " + to;
-    }
-
-    /**
-     * Returns the start date of the event.
-     *
-     * @return The LocalDate representing the start of the event.
-     */
-    public LocalDate getFrom() {
-        return this.from;
     }
 }

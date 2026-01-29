@@ -77,36 +77,32 @@ public class Ui {
     }
 
     /**
-     * Confirms that a task has been successfully added.
-     *
-     * @param t The task that was added.
-     * @param size The new total number of tasks in the list.
+     * Displays matching tasks found via the 'find' command.
      */
-    public void showAddedTask(Task t, int size) {
+    public void showMatchingTasks(ArrayList<Task> matchingTasks) {
+        System.out.println(" Here are the matching tasks in your list:");
+        if (matchingTasks.isEmpty()) {
+            System.out.println(" No matching tasks found.");
+        } else {
+            for (int i = 0; i < matchingTasks.size(); i++) {
+                System.out.println(" " + (i + 1) + "." + matchingTasks.get(i));
+            }
+        }
+    }
+
+    public void showAddedTask(Task task, int size) {
         System.out.println(" Got it. I've added this task:");
         System.out.println("   " + task);
         System.out.println(" Now you have " + size + " tasks in the list.");
     }
 
-    /**
-     * Confirms that a task has been successfully removed.
-     *
-     * @param t The task that was removed.
-     * @param size The remaining total number of tasks in the list.
-     */
-    public void showRemovedTask(Task t, int size) {
+    public void showRemovedTask(Task task, int size) {
         System.out.println(" Noted. I've removed this task:");
         System.out.println("   " + task);
         System.out.println(" Now you have " + size + " tasks in the list.");
     }
 
-    /**
-     * Displays the status change of a task (marked/unmarked).
-     *
-     * @param t The task whose status was changed.
-     * @param isMark True if the task was marked as done, false if unmarked.
-     */
-    public void showStatusChange(Task t, boolean isMark) {
+    public void showStatusChange(Task task, boolean isMark) {
         if (isMark) {
             System.out.println(" Nice! I've marked this task as done:\n   " + task);
         } else {
@@ -128,10 +124,10 @@ public class Ui {
             int count = 0;
             for (Task task : list) {
                 boolean isMatch = false;
-                if (t instanceof Deadline && ((Deadline) t).getBy().equals(queryDate)) {
+                if (task instanceof Deadline && ((Deadline) task).getBy().equals(queryDate)) {
                     isMatch = true;
                 }
-                if (t instanceof Event && ((Event) t).getFrom().equals(queryDate)) {
+                if (task instanceof Event && ((Event) task).getFrom().equals(queryDate)) {
                     isMatch = true;
                 }
 
