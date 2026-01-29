@@ -1,2 +1,2 @@
-D | 0 | return book | Sunday
-E | 1 | project meeting | Mon 2pm | 4pm
+D | 0 | return book | 2026-06-15
+E | 0 | orientation | 2026-08-01 | 2026-08-05
