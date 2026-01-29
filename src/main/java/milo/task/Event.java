@@ -3,6 +3,9 @@ package milo.task;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
+/**
+ * Represents a task that occurs within a specific time range.
+ */
 public class Event extends Task {
     protected LocalDate from;
     protected LocalDate to;
@@ -15,9 +18,9 @@ public class Event extends Task {
 
     @Override
     public String toString() {
-        return "[E]" + super.toString() + " (from: " +
-                from.format(DateTimeFormatter.ofPattern("MMM dd yyyy")) +
-                " to: " + to.format(DateTimeFormatter.ofPattern("MMM dd yyyy")) + ")";
+        return "[E]" + super.toString() + " (from: "
+                + from.format(DateTimeFormatter.ofPattern("MMM dd yyyy"))
+                + " to: " + to.format(DateTimeFormatter.ofPattern("MMM dd yyyy")) + ")";
     }
 
     @Override
@@ -25,5 +28,7 @@ public class Event extends Task {
         return "E | " + super.toFileFormat() + " | " + from + " | " + to;
     }
 
-    public LocalDate getFrom() { return this.from; }
+    public LocalDate getFrom() {
+        return this.from;
+    }
 }

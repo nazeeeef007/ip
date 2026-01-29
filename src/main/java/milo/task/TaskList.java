@@ -2,6 +2,9 @@ package milo.task;
 
 import java.util.ArrayList;
 
+/**
+ * Manages the list of tasks.
+ */
 public class TaskList {
     private final ArrayList<Task> tasks;
 
@@ -13,8 +16,8 @@ public class TaskList {
         this.tasks = tasks;
     }
 
-    public void addTask(Task t) {
-        tasks.add(t);
+    public void addTask(Task task) {
+        tasks.add(task);
     }
 
     public Task deleteTask(int index) {

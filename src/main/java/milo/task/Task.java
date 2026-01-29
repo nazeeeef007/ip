@@ -1,5 +1,8 @@
 package milo.task;
 
+/**
+ * Represents a generic task in the Milo application.
+ */
 public class Task {
     protected String description;
     protected boolean isDone;
@@ -9,8 +12,13 @@ public class Task {
         this.isDone = false;
     }
 
-    public void markAsDone() { this.isDone = true; }
-    public void unmarkDone() { this.isDone = false; }
+    public void markAsDone() {
+        this.isDone = true;
+    }
+
+    public void unmarkDone() {
+        this.isDone = false;
+    }
 
     public String getStatusIcon() {
         return (isDone ? "X" : " "); // mark done task with X

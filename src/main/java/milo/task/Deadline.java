@@ -3,19 +3,21 @@ package milo.task;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
+/**
+ * Represents a task with a specific deadline.
+ */
 public class Deadline extends Task {
     protected LocalDate by;
 
     public Deadline(String description, String by) {
         super(description);
-        // trim() is important to remove accidental spaces around the date
         this.by = LocalDate.parse(by.trim());
     }
 
     @Override
     public String toString() {
-        return "[D]" + super.toString() + " (by: " +
-                by.format(DateTimeFormatter.ofPattern("MMM dd yyyy")) + ")";
+        return "[D]" + super.toString() + " (by: "
+                + by.format(DateTimeFormatter.ofPattern("MMM dd yyyy")) + ")";
     }
 
     @Override
@@ -23,5 +25,7 @@ public class Deadline extends Task {
         return "D | " + super.toFileFormat() + " | " + by;
     }
 
-    public LocalDate getBy() { return this.by; }
+    public LocalDate getBy() {
+        return this.by;
+    }
 }
