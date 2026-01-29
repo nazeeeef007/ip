@@ -42,24 +42,31 @@ public class Parser {
             case LIST:
                 ui.showTaskList(tasks);
                 break;
+
             case MARK:
                 handleMarkUnmark(words, tasks, ui, true);
                 break;
+
             case UNMARK:
                 handleMarkUnmark(words, tasks, ui, false);
                 break;
+
             case TODO:
                 handleTodo(words, tasks, ui);
                 break;
+
             case DEADLINE:
                 handleDeadline(words, tasks, ui);
                 break;
+
             case EVENT:
                 handleEvent(words, tasks, ui);
                 break;
+
             case DELETE:
                 handleDelete(words, tasks, ui);
                 break;
+
             case FIND_DATE:
                 handleFindDate(words, tasks, ui);
                 break;
@@ -71,6 +78,7 @@ public class Parser {
                 throw new MiloException("OOPS!!! I'm sorry, but I don't know what that means :-(");
         }
 
+        // Save after every command that isn't BYE
         storage.save(tasks.getTasks());
         return false;
     }
