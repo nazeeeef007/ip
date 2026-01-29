@@ -1,13 +1,10 @@
 public enum Command {
-    BYE, LIST, MARK, UNMARK, TODO, DEADLINE, EVENT, DELETE, UNKNOWN;
+    BYE, LIST, MARK, UNMARK, TODO, DEADLINE, EVENT, DELETE, FIND_DATE, UNKNOWN;
 
-    /**
-     * Converts a string input to a Command enum.
-     * @param input The first word of the user's input.
-     * @return The corresponding Command or UNKNOWN.
-     */
     public static Command fromString(String input) {
         try {
+            // We'll map "find-date" to FIND_DATE
+            if (input.equalsIgnoreCase("find-date")) return FIND_DATE;
             return Command.valueOf(input.toUpperCase());
         } catch (IllegalArgumentException e) {
             return UNKNOWN;

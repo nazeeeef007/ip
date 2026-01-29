@@ -3,6 +3,9 @@ import java.util.Scanner;
 import java.util.ArrayList;
 import java.nio.file.*;
 import java.io.*;
+import java.time.format.DateTimeParseException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 
 
@@ -58,23 +61,38 @@ public class Milo {
 
                     case DEADLINE:
                         if (words.length < 2 || !words[1].contains(" /by ")) {
-                            throw new MiloException("OOPS!!! Deadlines must include description and ' /by ' [time].");
+                            throw new MiloException("OOPS!!! Deadlines must include description and ' /by ' [yyyy-mm-dd].");
                         }
                         String[] dParts = words[1].split(" /by ", 2);
-                        addTask(taskList, new Deadline(dParts[0], dParts[1]));
+                        try {
+                            addTask(taskList, new Deadline(dParts[0], dParts[1]));
+                        } catch (DateTimeParseException e) {
+                            throw new MiloException("OOPS!!! Please use the format YYYY-MM-DD for the date (e.g., 2026-01-29).");
+                        }
                         break;
 
                     case EVENT:
                         if (words.length < 2 || !words[1].contains(" /from ") || !words[1].contains(" /to ")) {
-                            throw new MiloException("OOPS!!! Events must include description, ' /from ' [time] and ' /to ' [time].");
+                            throw new MiloException("OOPS!!! Events must include description, ' /from ' [yyyy-mm-dd] and ' /to ' [yyyy-mm-dd].");
                         }
                         String[] eParts = words[1].split(" /from ", 2);
                         String[] timeParts = eParts[1].split(" /to ", 2);
-                        addTask(taskList, new Event(eParts[0], timeParts[0], timeParts[1]));
+                        try {
+                            addTask(taskList, new Event(eParts[0], timeParts[0], timeParts[1]));
+                        } catch (DateTimeParseException e) {
+                            throw new MiloException("OOPS!!! Please use YYYY-MM-DD for event dates.");
+                        }
                         break;
 
                     case DELETE:
                         handleDelete(input, taskList);
+                        break;
+
+                    case FIND_DATE:
+                        if (words.length < 2) {
+                            throw new MiloException("OOPS!!! Please specify a date in YYYY-MM-DD format.");
+                        }
+                        handleFindDate(words[1].trim(), taskList);
                         break;
 
                     case UNKNOWN:
@@ -162,16 +180,21 @@ public class Milo {
             for (String line : lines) {
                 String[] parts = line.split(" \\| ");
                 Task task = null;
-                switch (parts[0]) {
-                    case "T":
-                        task = new Todo(parts[2]);
-                        break;
-                    case "D":
-                        task = new Deadline(parts[2], parts[3]);
-                        break;
-                    case "E":
-                        task = new Event(parts[2], parts[3], parts[4]);
-                        break;
+                try {
+                    switch (parts[0]) {
+                        case "T":
+                            task = new Todo(parts[2]);
+                            break;
+                        case "D":
+                            task = new Deadline(parts[2], parts[3]);
+                            break;
+                        case "E":
+                            task = new Event(parts[2], parts[3], parts[4]);
+                            break;
+                    }
+                } catch (DateTimeParseException | ArrayIndexOutOfBoundsException e) {
+                    System.out.println(" Skipping corrupted line: " + line);
+                    continue;
                 }
                 if (task != null) {
                     if (parts[1].equals("1")) task.markAsDone();
@@ -180,6 +203,32 @@ public class Milo {
             }
         } catch (IOException e) {
             System.out.println(" Error loading file: " + e.getMessage());
+        }
+    }
+
+    private static void handleFindDate(String dateStr, ArrayList<Task> list) throws MiloException {
+        try {
+            LocalDate queryDate = LocalDate.parse(dateStr);
+            System.out.println(" Here are the tasks occurring on " + queryDate.format(DateTimeFormatter.ofPattern("MMM dd yyyy")) + ":");
+
+            int count = 0;
+            for (Task t : list) {
+                boolean isMatch = false;
+                if (t instanceof Deadline) {
+                    if (((Deadline) t).getBy().equals(queryDate)) isMatch = true;
+                } else if (t instanceof Event) {
+                    // Check if the query date is the start date
+                    if (((Event) t).getFrom().equals(queryDate)) isMatch = true;
+                }
+
+                if (isMatch) {
+                    count++;
+                    System.out.println(" " + count + "." + t);
+                }
+            }
+            if (count == 0) System.out.println(" No tasks found for this date.");
+        } catch (DateTimeParseException e) {
+            throw new MiloException("OOPS!!! Please use the format YYYY-MM-DD (e.g., 2026-06-15).");
         }
     }
 }
