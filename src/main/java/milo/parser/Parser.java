@@ -12,6 +12,7 @@ import milo.exception.MiloException;
 import milo.command.Command;
 import java.io.IOException;
 import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
 
 public class Parser {
 
@@ -62,6 +63,10 @@ public class Parser {
 
             case FIND_DATE:
                 handleFindDate(words, tasks, ui);
+                break;
+
+            case FIND:
+                handleFind(words, tasks, ui);
                 break;
 
             case UNKNOWN:
@@ -143,5 +148,15 @@ public class Parser {
     private static void handleFindDate(String[] words, TaskList tasks, Ui ui) throws MiloException {
         if (words.length < 2) throw new MiloException("Please specify a date in YYYY-MM-DD format.");
         ui.showTasksByDate(words[1].trim(), tasks.getTasks());
+    }
+
+    private static void handleFind(String[] words, TaskList tasks, Ui ui) throws MiloException {
+        if (words.length < 2 || words[1].trim().isEmpty()) {
+            throw new MiloException("Please specify a keyword to find.");
+        }
+
+        String keyword = words[1].trim();
+        ArrayList<Task> matchingTasks = tasks.findTasks(keyword);
+        ui.showMatchingTasks(matchingTasks);
     }
 }

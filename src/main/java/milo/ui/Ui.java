@@ -45,42 +45,63 @@ public class Ui {
         }
     }
 
-    public void showAddedTask(Task t, int size) {
-        System.out.println(" Got it. I've added this task:");
-        System.out.println("   " + t);
-        System.out.println(" Now you have " + size + " tasks in the list.");
-    }
-
-    public void showRemovedTask(Task t, int size) {
-        System.out.println(" Noted. I've removed this task:");
-        System.out.println("   " + t);
-        System.out.println(" Now you have " + size + " tasks in the list.");
-    }
-
-    public void showStatusChange(Task t, boolean isMark) {
-        if (isMark) {
-            System.out.println(" Nice! I've marked this task as done:\n   " + t);
+    /**
+     * Displays matching tasks found via the 'find' command.
+     */
+    public void showMatchingTasks(ArrayList<Task> matchingTasks) {
+        System.out.println(" Here are the matching tasks in your list:");
+        if (matchingTasks.isEmpty()) {
+            System.out.println(" No matching tasks found.");
         } else {
-            System.out.println(" OK, I've marked this task as not done yet:\n   " + t);
+            for (int i = 0; i < matchingTasks.size(); i++) {
+                System.out.println(" " + (i + 1) + "." + matchingTasks.get(i));
+            }
+        }
+    }
+
+    public void showAddedTask(Task task, int size) {
+        System.out.println(" Got it. I've added this task:");
+        System.out.println("   " + task);
+        System.out.println(" Now you have " + size + " tasks in the list.");
+    }
+
+    public void showRemovedTask(Task task, int size) {
+        System.out.println(" Noted. I've removed this task:");
+        System.out.println("   " + task);
+        System.out.println(" Now you have " + size + " tasks in the list.");
+    }
+
+    public void showStatusChange(Task task, boolean isMark) {
+        if (isMark) {
+            System.out.println(" Nice! I've marked this task as done:\n   " + task);
+        } else {
+            System.out.println(" OK, I've marked this task as not done yet:\n   " + task);
         }
     }
 
     public void showTasksByDate(String dateStr, ArrayList<Task> list) {
         try {
             LocalDate queryDate = LocalDate.parse(dateStr);
-            System.out.println(" Here are the tasks occurring on " + queryDate.format(DateTimeFormatter.ofPattern("MMM dd yyyy")) + ":");
+            System.out.println(" Here are the tasks occurring on "
+                    + queryDate.format(DateTimeFormatter.ofPattern("MMM dd yyyy")) + ":");
             int count = 0;
-            for (Task t : list) {
+            for (Task task : list) {
                 boolean isMatch = false;
-                if (t instanceof Deadline && ((Deadline) t).getBy().equals(queryDate)) isMatch = true;
-                if (t instanceof Event && ((Event) t).getFrom().equals(queryDate)) isMatch = true;
+                if (task instanceof Deadline && ((Deadline) task).getBy().equals(queryDate)) {
+                    isMatch = true;
+                }
+                if (task instanceof Event && ((Event) task).getFrom().equals(queryDate)) {
+                    isMatch = true;
+                }
 
                 if (isMatch) {
                     count++;
-                    System.out.println(" " + count + "." + t);
+                    System.out.println(" " + count + "." + task);
                 }
             }
-            if (count == 0) System.out.println(" No tasks found for this date.");
+            if (count == 0) {
+                System.out.println(" No tasks found for this date.");
+            }
         } catch (Exception e) {
             System.out.println(" OOPS!!! Please use the format YYYY-MM-DD for searching.");
         }
