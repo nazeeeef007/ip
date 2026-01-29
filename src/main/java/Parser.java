@@ -1,3 +1,4 @@
+import java.io.IOException;
 import java.time.format.DateTimeParseException;
 
 public class Parser {
@@ -11,7 +12,7 @@ public class Parser {
      * @return boolean true if it's an exit command, false otherwise.
      * @throws MiloException If command is invalid or arguments are missing.
      */
-    public static boolean parse(String fullCommand, TaskList tasks, Ui ui, Storage storage) throws MiloException {
+    public static boolean parse(String fullCommand, TaskList tasks, Ui ui, Storage storage) throws MiloException, IOException {
         String[] words = fullCommand.split(" ", 2);
         Command command = Command.fromString(words[0]);
 
