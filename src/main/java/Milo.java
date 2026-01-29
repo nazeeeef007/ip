@@ -1,10 +1,18 @@
+import java.util.List;
 import java.util.Scanner;
 import java.util.ArrayList;
+import java.nio.file.*;
+import java.io.*;
+
+
 
 public class Milo {
+    private static final String FILE_PATH = "./data/milo.txt";
+
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         ArrayList<Task> taskList = new ArrayList<>();
+        loadTasks(taskList);
         String name = "Milo";
 
         System.out.println("____________________________________________________________");
@@ -76,6 +84,7 @@ public class Milo {
             } catch (MiloException e) {
                 System.out.println(" " + e.getMessage());
             }
+            saveTasks(taskList);
             System.out.println("____________________________________________________________");
         }
 
@@ -128,6 +137,49 @@ public class Milo {
             System.out.println(" Now you have " + list.size() + " tasks in the list.");
         } catch (NumberFormatException e) {
             throw new MiloException("OOPS!!! '" + parts[1] + "' is not a valid task number.");
+        }
+    }
+
+    private static void saveTasks(ArrayList<Task> list) {
+        try {
+            Files.createDirectories(Paths.get("./data")); // Create folder if missing
+            List<String> lines = new ArrayList<>();
+            for (Task t : list) {
+                lines.add(t.toFileFormat());
+            }
+            Files.write(Paths.get(FILE_PATH), lines);
+        } catch (IOException e) {
+            System.out.println(" Error saving tasks: " + e.getMessage());
+        }
+    }
+
+    private static void loadTasks(ArrayList<Task> taskList) {
+        Path path = Paths.get(FILE_PATH);
+        if (!Files.exists(path)) return;
+
+        try {
+            List<String> lines = Files.readAllLines(path);
+            for (String line : lines) {
+                String[] parts = line.split(" \\| ");
+                Task task = null;
+                switch (parts[0]) {
+                    case "T":
+                        task = new Todo(parts[2]);
+                        break;
+                    case "D":
+                        task = new Deadline(parts[2], parts[3]);
+                        break;
+                    case "E":
+                        task = new Event(parts[2], parts[3], parts[4]);
+                        break;
+                }
+                if (task != null) {
+                    if (parts[1].equals("1")) task.markAsDone();
+                    taskList.add(task);
+                }
+            }
+        } catch (IOException e) {
+            System.out.println(" Error loading file: " + e.getMessage());
         }
     }
 }
