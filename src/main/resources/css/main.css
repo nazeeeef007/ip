@@ -1,0 +1,17 @@
+.root {
+    -fx-background-color: #f4f4f4;
+}
+
+.text-field {
+    -fx-font-family: "Segoe UI", Helvetica, Arial, sans-serif;
+}
+
+.button {
+    -fx-background-color: #0078D7;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+}
+
+.button:hover {
+    -fx-background-color: #005a9e;
+}

@@ -5,122 +5,147 @@ import milo.task.TaskList;
 import milo.task.Event;
 import milo.task.Deadline;
 
-import java.util.Scanner;
 import java.util.ArrayList;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
 /**
  * Handles the user interface of the application.
- * Responsible for reading user input and displaying messages to the user.
+ * In this GUI version, methods return Strings to be displayed in the chat interface
+ * instead of printing directly to the console.
  */
 public class Ui {
-    private final Scanner scanner;
-    private static final String DIVIDER = "____________________________________________________________";
 
     /**
-     * Constructs a Ui object and initializes the scanner for user input.
+     * Constructs a Ui object.
      */
     public Ui() {
-        this.scanner = new Scanner(System.in);
+        // Scanner is removed as input is now handled by the JavaFX TextField.
     }
 
     /**
-     * Shows the welcome message to the user.
+     * Returns the welcome message to the user.
+     * * @return The welcome string.
      */
-    public void showWelcome() {
-        System.out.println(DIVIDER + "\n Hello! I'm Milo\n What can I do for you?\n" + DIVIDER);
+    public String showWelcome() {
+        return "Hello! I'm Milo\nWhat can I do for you?";
     }
 
     /**
-     * Prints a horizontal divider line.
+     * Returns a horizontal divider line string (optional for GUI).
+     * * @return The divider string.
      */
-    public void showLine() {
-        System.out.println(DIVIDER);
+    public String showLine() {
+        return "____________________________________________________________";
     }
 
     /**
-     * Reads the next line of input from the user.
+     * Returns an error message to the user.
      *
-     * @return The raw string input entered by the user.
+     * @param message The error message to be returned.
+     * @return Formatted error string.
      */
-    public String readCommand() {
-        return scanner.nextLine();
+    public String showError(String message) {
+        return " " + message;
     }
 
     /**
-     * Displays an error message to the user.
-     *
-     * @param message The error message to be displayed.
+     * Returns the exit message when the application terminates.
+     * * @return The exit string.
      */
-    public void showError(String message) {
-        System.out.println(" " + message);
+    public String showExit() {
+        return " Bye. Hope to see you again soon!";
     }
 
     /**
-     * Shows the exit message when the application terminates.
-     */
-    public void showExit() {
-        System.out.println(" Bye. Hope to see you again soon!");
-    }
-
-    /**
-     * Prints all tasks currently in the task list.
+     * Returns a string containing all tasks currently in the task list.
      *
      * @param tasks The TaskList containing tasks to be displayed.
+     * @return Formatted list of tasks.
      */
-    public void showTaskList(TaskList tasks) {
-        System.out.println(" Here are the tasks in your list:");
-        for (int i = 0; i < tasks.getSize(); i++) {
-            System.out.println(" " + (i + 1) + "." + tasks.getTask(i));
+    public String showTaskList(TaskList tasks) {
+        if (tasks.getSize() == 0) {
+            return " Your list is currently empty.";
         }
-    }
-
-    /**
-     * Displays matching tasks found via the 'find' command.
-     */
-    public void showMatchingTasks(ArrayList<Task> matchingTasks) {
-        System.out.println(" Here are the matching tasks in your list:");
-        if (matchingTasks.isEmpty()) {
-            System.out.println(" No matching tasks found.");
-        } else {
-            for (int i = 0; i < matchingTasks.size(); i++) {
-                System.out.println(" " + (i + 1) + "." + matchingTasks.get(i));
+        StringBuilder sb = new StringBuilder(" Here are the tasks in your list:\n");
+        for (int i = 0; i < tasks.getSize(); i++) {
+            sb.append(" ").append(i + 1).append(".").append(tasks.getTask(i));
+            if (i < tasks.getSize() - 1) {
+                sb.append("\n");
             }
         }
+        return sb.toString();
     }
 
-    public void showAddedTask(Task task, int size) {
-        System.out.println(" Got it. I've added this task:");
-        System.out.println("   " + task);
-        System.out.println(" Now you have " + size + " tasks in the list.");
+    /**
+     * Returns matching tasks found via the 'find' command as a string.
+     * * @param matchingTasks The list of tasks that matched the search.
+     * @return Formatted string of matching tasks.
+     */
+    public String showMatchingTasks(ArrayList<Task> matchingTasks) {
+        if (matchingTasks.isEmpty()) {
+            return " No matching tasks found.";
+        }
+        StringBuilder sb = new StringBuilder(" Here are the matching tasks in your list:\n");
+        for (int i = 0; i < matchingTasks.size(); i++) {
+            sb.append(" ").append(i + 1).append(".").append(matchingTasks.get(i));
+            if (i < matchingTasks.size() - 1) {
+                sb.append("\n");
+            }
+        }
+        return sb.toString();
     }
 
-    public void showRemovedTask(Task task, int size) {
-        System.out.println(" Noted. I've removed this task:");
-        System.out.println("   " + task);
-        System.out.println(" Now you have " + size + " tasks in the list.");
+    /**
+     * Returns a message confirming a task was added.
+     * * @param task The task that was added.
+     * @param size The current size of the task list.
+     * @return Feedback string.
+     */
+    public String showAddedTask(Task task, int size) {
+        return " Got it. I've added this task:\n"
+                + "   " + task + "\n"
+                + " Now you have " + size + " tasks in the list.";
     }
 
-    public void showStatusChange(Task task, boolean isMark) {
+    /**
+     * Returns a message confirming a task was removed.
+     * * @param task The task that was removed.
+     * @param size The current size of the task list.
+     * @return Feedback string.
+     */
+    public String showRemovedTask(Task task, int size) {
+        return " Noted. I've removed this task:\n"
+                + "   " + task + "\n"
+                + " Now you have " + size + " tasks in the list.";
+    }
+
+    /**
+     * Returns a message confirming a task's status was changed.
+     * * @param task The task that was updated.
+     * @param isMark True if marked as done, false otherwise.
+     * @return Feedback string.
+     */
+    public String showStatusChange(Task task, boolean isMark) {
         if (isMark) {
-            System.out.println(" Nice! I've marked this task as done:\n   " + task);
+            return " Nice! I've marked this task as done:\n   " + task;
         } else {
-            System.out.println(" OK, I've marked this task as not done yet:\n   " + task);
+            return " OK, I've marked this task as not done yet:\n   " + task;
         }
     }
 
     /**
-     * Finds and displays tasks that occur on a specific date.
+     * Finds and returns tasks that occur on a specific date.
      *
      * @param dateStr The date string in YYYY-MM-DD format.
      * @param list The list of tasks to search through.
+     * @return Formatted string of tasks on that date.
      */
-    public void showTasksByDate(String dateStr, ArrayList<Task> list) {
+    public String showTasksByDate(String dateStr, ArrayList<Task> list) {
         try {
             LocalDate queryDate = LocalDate.parse(dateStr);
-            System.out.println(" Here are the tasks occurring on "
-                    + queryDate.format(DateTimeFormatter.ofPattern("MMM dd yyyy")) + ":");
+            StringBuilder sb = new StringBuilder(" Here are the tasks occurring on "
+                    + queryDate.format(DateTimeFormatter.ofPattern("MMM dd yyyy")) + ":\n");
             int count = 0;
             for (Task task : list) {
                 boolean isMatch = false;
@@ -133,14 +158,15 @@ public class Ui {
 
                 if (isMatch) {
                     count++;
-                    System.out.println(" " + count + "." + task);
+                    sb.append(" ").append(count).append(".").append(task).append("\n");
                 }
             }
             if (count == 0) {
-                System.out.println(" No tasks found for this date.");
+                return " No tasks found for this date.";
             }
+            return sb.toString().trim();
         } catch (Exception e) {
-            System.out.println(" OOPS!!! Please use the format YYYY-MM-DD for searching.");
+            return " OOPS!!! Please use the format YYYY-MM-DD for searching.";
         }
     }
 }

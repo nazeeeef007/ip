@@ -1,0 +1,11 @@
+.label {
+    -fx-padding: 8 12 8 12;
+    -fx-background-radius: 15;
+    -fx-background-color: #E9E9EB; /* Light grey for user */
+    -fx-text-fill: black;
+}
+
+.reply-label {
+    -fx-background-color: #0078D7; /* Blue for Milo */
+    -fx-text-fill: white;
+}
