@@ -23,6 +23,8 @@ public class TaskList {
      * @param tasks An ArrayList of tasks to initialize the list.
      */
     public TaskList(ArrayList<Task> tasks) {
+        // Assumption: The loaded list from storage shouldn't be null
+        assert tasks != null : "Initial task list should not be null";
         this.tasks = tasks;
     }
 
@@ -32,6 +34,8 @@ public class TaskList {
      * @param t The task to be added.
      */
     public void addTask(Task t) {
+        // Assumption: We should never be adding a null task object
+        assert t != null : "Cannot add a null task to the list";
         tasks.add(t);
     }
 
@@ -42,6 +46,8 @@ public class TaskList {
      * @return The task that was removed.
      */
     public Task deleteTask(int index) {
+        // Assumption: The caller logic (Parser) has already validated the index
+        assert index >= 0 && index < tasks.size() : "Index out of bounds for deletion: " + index;
         return tasks.remove(index);
     }
 
@@ -51,6 +57,8 @@ public class TaskList {
      * @return An ArrayList containing all tasks.
      */
     public ArrayList<Task> getTasks() {
+        // Assumption: The internal list is never null
+        assert tasks != null : "Internal tasks list is null";
         return tasks;
     }
 
@@ -70,6 +78,8 @@ public class TaskList {
      * @return The task at the specified index.
      */
     public Task getTask(int index) {
+        // Assumption: The index must be valid for the current list size
+        assert index >= 0 && index < tasks.size() : "Index out of bounds for retrieval: " + index;
         return tasks.get(index);
     }
 
@@ -80,6 +90,9 @@ public class TaskList {
      * @return A list of tasks that match the keyword.
      */
     public ArrayList<Task> findTasks(String keyword) {
+        // Assumption: Search keyword should not be null
+        assert keyword != null : "Search keyword should not be null";
+
         ArrayList<Task> matchingTasks = new ArrayList<>();
         for (Task task : tasks) {
             if (task.toString().contains(keyword)) {

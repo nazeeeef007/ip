@@ -33,8 +33,22 @@ public class Parser {
      */
     public static String parse(String fullCommand, TaskList tasks, Ui ui, Storage storage)
             throws MiloException, IOException {
+
+        // Assertions to verify that dependencies are correctly injected
+        assert tasks != null : "TaskList tasks should not be null";
+        assert ui != null : "Ui ui should not be null";
+        assert storage != null : "Storage storage should not be null";
+
         String[] words = fullCommand.split(" ", 2);
+
+        // Assumption: The input string is at least empty, never null if coming from GUI
+        assert words.length > 0 : "Split command should have at least one part";
+
         Command command = Command.fromString(words[0]);
+
+        // Assumption: Command.fromString always returns a non-null Command enum
+        assert command != null : "Command should never be null";
+
         String response;
 
         switch (command) {
@@ -89,12 +103,6 @@ public class Parser {
 
     /**
      * Handles the creation and addition of a Todo task.
-     *
-     * @param words The split input containing the command and description.
-     * @param tasks The TaskList to add the Todo to.
-     * @param ui The user interface to show feedback.
-     * @return Feedback message from Ui.
-     * @throws MiloException If the description is empty.
      */
     private static String handleTodo(String[] words, TaskList tasks, Ui ui) throws MiloException {
         if (words.length < 2 || words[1].trim().isEmpty()) {
@@ -103,17 +111,13 @@ public class Parser {
 
         Task task = new Todo(words[1]);
         tasks.addTask(task);
+
+        assert tasks.getSize() > 0 : "TaskList size should increase after adding a task";
         return ui.showAddedTask(task, tasks.getSize());
     }
 
     /**
      * Handles the creation and addition of a Deadline task.
-     *
-     * @param words The split input containing description and date.
-     * @param tasks The TaskList to add the Deadline to.
-     * @param ui The user interface to show feedback.
-     * @return Feedback message from Ui.
-     * @throws MiloException If the format is incorrect or date is missing.
      */
     private static String handleDeadline(String[] words, TaskList tasks, Ui ui) throws MiloException {
         if (words.length < 2 || !words[1].contains(" /by ")) {
@@ -122,6 +126,10 @@ public class Parser {
 
         try {
             String[] parts = words[1].split(" /by ", 2);
+
+            // Assumption: split worked correctly and parts array has 2 elements
+            assert parts.length == 2 : "Deadline split should result in 2 parts";
+
             Task task = new Deadline(parts[0], parts[1]);
             tasks.addTask(task);
             return ui.showAddedTask(task, tasks.getSize());
@@ -132,12 +140,6 @@ public class Parser {
 
     /**
      * Handles the creation and addition of an Event task.
-     *
-     * @param words The split input containing description and time range.
-     * @param tasks The TaskList to add the Event to.
-     * @param ui The user interface to show feedback.
-     * @return Feedback message from Ui.
-     * @throws MiloException If the format is incorrect or dates are missing.
      */
     private static String handleEvent(String[] words, TaskList tasks, Ui ui) throws MiloException {
         if (words.length < 2 || !words[1].contains(" /from ") || !words[1].contains(" /to ")) {
@@ -146,7 +148,11 @@ public class Parser {
 
         try {
             String[] eParts = words[1].split(" /from ", 2);
+            assert eParts.length == 2 : "Event split /from should result in 2 parts";
+
             String[] timeParts = eParts[1].split(" /to ", 2);
+            assert timeParts.length == 2 : "Event split /to should result in 2 parts";
+
             Task task = new Event(eParts[0], timeParts[0], timeParts[1]);
             tasks.addTask(task);
             return ui.showAddedTask(task, tasks.getSize());
@@ -157,13 +163,6 @@ public class Parser {
 
     /**
      * Handles the marking or unmarking of a task as done.
-     *
-     * @param words The split input containing the task index.
-     * @param tasks The TaskList to search for the task.
-     * @param ui The user interface to show feedback.
-     * @param isMark True to mark as done, false to unmark.
-     * @return Feedback message from Ui.
-     * @throws MiloException If the index is missing or invalid.
      */
     private static String handleMarkUnmark(String[] words, TaskList tasks, Ui ui, boolean isMark) throws MiloException {
         if (words.length < 2) {
@@ -171,6 +170,11 @@ public class Parser {
         }
         try {
             int index = Integer.parseInt(words[1]) - 1;
+
+            // Validation for user input is done via MiloException,
+            // but we can assert that the TaskList is not empty if we reached here.
+            assert tasks.getSize() >= 0 : "TaskList size cannot be negative";
+
             Task task = tasks.getTask(index);
 
             if (isMark) {
@@ -187,12 +191,6 @@ public class Parser {
 
     /**
      * Handles the deletion of a task from the list.
-     *
-     * @param words The split input containing the task index to delete.
-     * @param tasks The TaskList to remove the task from.
-     * @param ui The user interface to show feedback.
-     * @return Feedback message from Ui.
-     * @throws MiloException If the index is missing or invalid.
      */
     private static String handleDelete(String[] words, TaskList tasks, Ui ui) throws MiloException {
         if (words.length < 2) {
@@ -201,7 +199,13 @@ public class Parser {
 
         try {
             int index = Integer.parseInt(words[1]) - 1;
+            int initialSize = tasks.getSize();
+
             Task removedTask = tasks.deleteTask(index);
+
+            // Assumption: Size should definitely decrease after a successful delete
+            assert tasks.getSize() == initialSize - 1 : "TaskList size should decrease by 1";
+
             return ui.showRemovedTask(removedTask, tasks.getSize());
         } catch (NumberFormatException | IndexOutOfBoundsException e) {
             throw new MiloException("Invalid task number.");
@@ -210,28 +214,19 @@ public class Parser {
 
     /**
      * Handles searching for tasks occurring on a specific date.
-     *
-     * @param words The split input containing the search date.
-     * @param tasks The TaskList to search within.
-     * @param ui The user interface to display matching tasks.
-     * @return Feedback message from Ui.
-     * @throws MiloException If the date is missing.
      */
     private static String handleFindDate(String[] words, TaskList tasks, Ui ui) throws MiloException {
         if (words.length < 2) {
             throw new MiloException("Please specify a date in YYYY-MM-DD format.");
         }
-        return ui.showTasksByDate(words[1].trim(), tasks.getTasks());
+        String dateStr = words[1].trim();
+        assert !dateStr.isEmpty() : "Search date string should not be empty after trim";
+
+        return ui.showTasksByDate(dateStr, tasks.getTasks());
     }
 
     /**
      * Handles searching for tasks by keyword.
-     *
-     * @param words The split input containing the keyword.
-     * @param tasks The TaskList to search within.
-     * @param ui The user interface to display matching tasks.
-     * @return Feedback message from Ui.
-     * @throws MiloException If the keyword is missing.
      */
     private static String handleFind(String[] words, TaskList tasks, Ui ui) throws MiloException {
         if (words.length < 2 || words[1].trim().isEmpty()) {
@@ -239,6 +234,8 @@ public class Parser {
         }
 
         String keyword = words[1].trim();
+        assert !keyword.isEmpty() : "Keyword should not be empty for search";
+
         ArrayList<Task> matchingTasks = tasks.findTasks(keyword);
         return ui.showMatchingTasks(matchingTasks);
     }
