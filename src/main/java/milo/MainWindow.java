@@ -61,7 +61,7 @@ public class MainWindow extends AnchorPane {
          * If your Milo class has a getCommandType() method, you can pass it here
          * to change the color of the chat bubble.
          */
-        // String commandType = milo.getCommandType();
+
 
         dialogContainer.getChildren().addAll(
                 DialogBox.getUserDialog(input, userImage),
