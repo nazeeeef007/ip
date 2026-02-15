@@ -34,19 +34,14 @@ public class Parser {
     public static String parse(String fullCommand, TaskList tasks, Ui ui, Storage storage)
             throws MiloException, IOException {
 
-        // Assertions to verify that dependencies are correctly injected
         assert tasks != null : "TaskList tasks should not be null";
         assert ui != null : "Ui ui should not be null";
         assert storage != null : "Storage storage should not be null";
 
         String[] words = fullCommand.split(" ", 2);
-
-        // Assumption: The input string is at least empty, never null if coming from GUI
         assert words.length > 0 : "Split command should have at least one part";
 
         Command command = Command.fromString(words[0]);
-
-        // Assumption: Command.fromString always returns a non-null Command enum
         assert command != null : "Command should never be null";
 
         String response;
@@ -91,6 +86,10 @@ public class Parser {
                 response = handleFind(words, tasks, ui);
                 break;
 
+            case SORT:
+                response = handleSort(words, tasks, ui);
+                break;
+
             case UNKNOWN:
             default:
                 throw new MiloException("OOPS!!! I'm sorry, but I don't know what that means :-(");
@@ -99,6 +98,26 @@ public class Parser {
         // Save after every command that modifies the list
         storage.save(tasks.getTasks());
         return response;
+    }
+
+    /**
+     * Handles the sorting of tasks (C-Sort extension).
+     */
+    private static String handleSort(String[] words, TaskList tasks, Ui ui) throws MiloException {
+        if (words.length < 2 || words[1].trim().isEmpty()) {
+            throw new MiloException("Please specify sort type: 'sort name' or 'sort date'.");
+        }
+
+        String sortType = words[1].trim().toLowerCase();
+        if (sortType.equals("name")) {
+            tasks.sortAlphabetically();
+            return "Sorted tasks alphabetically by description!";
+        } else if (sortType.equals("date")) {
+            tasks.sortChronologically();
+            return "Sorted tasks chronologically by date! (Tasks without dates are at the bottom)";
+        } else {
+            throw new MiloException("Unknown sort type. Please use 'sort name' or 'sort date'.");
+        }
     }
 
     /**
@@ -126,8 +145,6 @@ public class Parser {
 
         try {
             String[] parts = words[1].split(" /by ", 2);
-
-            // Assumption: split worked correctly and parts array has 2 elements
             assert parts.length == 2 : "Deadline split should result in 2 parts";
 
             Task task = new Deadline(parts[0], parts[1]);
@@ -170,9 +187,6 @@ public class Parser {
         }
         try {
             int index = Integer.parseInt(words[1]) - 1;
-
-            // Validation for user input is done via MiloException,
-            // but we can assert that the TaskList is not empty if we reached here.
             assert tasks.getSize() >= 0 : "TaskList size cannot be negative";
 
             Task task = tasks.getTask(index);
@@ -202,8 +216,6 @@ public class Parser {
             int initialSize = tasks.getSize();
 
             Task removedTask = tasks.deleteTask(index);
-
-            // Assumption: Size should definitely decrease after a successful delete
             assert tasks.getSize() == initialSize - 1 : "TaskList size should decrease by 1";
 
             return ui.showRemovedTask(removedTask, tasks.getSize());

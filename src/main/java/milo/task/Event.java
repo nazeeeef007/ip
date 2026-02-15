@@ -2,6 +2,7 @@ package milo.task;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.time.LocalDateTime;
 
 /**
  * Represents a task that occurs during a specific time period.
@@ -42,5 +43,10 @@ public class Event extends Task {
     @Override
     public String toFileFormat() {
         return "E | " + super.toFileFormat() + " | " + from + " | " + to;
+    }
+
+    @Override
+    public LocalDateTime getDateTime() {
+        return from.atStartOfDay();
     }
 }

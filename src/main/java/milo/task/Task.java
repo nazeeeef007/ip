@@ -1,4 +1,5 @@
 package milo.task;
+import java.time.LocalDateTime;
 
 /**
  * Represents a generic task in the Milo application.
@@ -55,5 +56,14 @@ public class Task {
      */
     public String toFileFormat() {
         return (isDone ? "1" : "0") + " | " + description;
+    }
+
+    /**
+     * Returns the date/time associated with the task.
+     * Overridden by subclasses that have dates (Deadline, Event).
+     * * @return LocalDateTime of the task, or null if none exists.
+     */
+    public LocalDateTime getDateTime() {
+        return null;
     }
 }
